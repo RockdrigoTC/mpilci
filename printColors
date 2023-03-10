@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Define variables con los códigos de colores y estilos
+BLACK='\e[30m'
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+MAGENTA='\e[35m'
+CYAN='\e[36m'
+WHITE='\e[37m'
+BOLD='\e[1m'
+FAINT='\e[2m'
+ITALIC='\e[3m'
+UNDERLINE='\e[4m'
+BLINK='\e[5m'
+RESET='\e[0m'
+
+function printC() {
+  local message=$1
+  local color=$2
+  local style=$3
+  echo -e "${style}${color}${message}${RESET}"
+}
+

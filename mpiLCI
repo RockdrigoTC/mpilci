@@ -1,0 +1,532 @@
+#!/bin/bash
+
+source printColors
+
+dir="$(pwd)/MPI"
+dirSource="$dir/sourceMPI"
+dirBuild="$dir/buildMPI"
+dirOut="$dir/outputMPI"
+files=("$dir"/*)
+start=0
+end=4
+
+# Función para mostrar el menú del "mpiLCI"
+function mostrar_menu_mpic() {
+    clear
+    opc=0
+    while [ $opc -ne 4 ]; do
+        echo ""
+        printC "Menu mpiLCI:" "$YELLOW" "$BOLD"
+        printC "1. Compilar" "" "$BOLD"
+        printC "2. Ejecutar" "" "$BOLD"
+        printC "3. Eliminar" "" "$BOLD"
+        printC "4. Salir" "" "$BOLD"
+
+        echo ""
+        echo -n -e "$GREEN>> "
+        read opc
+        echo -e "$RESET"
+        case $opc in
+        1)
+            mostrar_menu_compilar
+            clear
+            ;;
+        2)
+            mostrar_menu_ejecutar
+            clear
+            ;;
+        3)
+            mostrar_menu_eliminar
+            clear
+            ;;
+        4)
+            clear
+            printC "Byte!" "$GREEN" "$BOLD"
+            ;;
+        *)
+            clear
+            printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
+            ;;
+        esac
+    done
+}
+
+# Función para el menú de Compilar
+function mostrar_menu_compilar() {
+    
+    # mostrar la primera página de archivos
+    start=0
+    end=4
+    clear
+    echo ""
+    show_files "" "source"
+
+    # loop del menú
+    while true; do
+        # mostrar opciones del menú
+        echo ""
+        printC "Menu Compilar:" "$YELLOW" "$BOLD"
+        echo "Seleccione una opción:"
+        printC "1) sig. pag." "" "$BOLD"
+        printC "2) prev. pag." "" "$BOLD"
+        printC "3) seleccionar archivo" "" "$BOLD"
+        printC "4) regresar" "" "$BOLD"
+
+        # leer opción del usuario
+        echo ""
+        echo -n -e "$GREEN>> "
+        read option
+        echo -e "$RESET"
+
+        clear
+        echo ""
+        # procesar opción seleccionada
+        case $option in
+        1) # avanzar a la siguiente página
+            show_files "1" "source"
+            ;;
+        2) # retroceder a la página anterior
+            show_files "2" "source"
+            ;;
+        3) # buscar codigo fuente
+            echo "Escribe el nombre del archivo fuente name.c o name.cpp:"
+            echo -n -e "$GREEN>> "
+            read source
+            echo -e "$RESET"
+            clear
+            echo ""
+            if check_source "$source"; then
+                exe="${source%.*}"
+                compilar "$exe" "$source"
+                printC "Presione enter para continuar."
+                read continuar
+                clear
+                echo ""
+            fi
+            show_files "" "source"
+            ;;
+        4) # regresar
+            return
+            ;;
+        *)
+            clear
+            echo ""
+            printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
+            show_files "" "source"
+            ;;
+        esac
+    done
+}
+
+# Función para el menú de Ejecutar
+function mostrar_menu_ejecutar() {
+
+    # mostrar la primera página de archivos
+    start=0
+    end=4
+    clear
+    echo ""
+    show_files "" "build"
+
+    # loop del menú
+    while true; do
+        # mostrar opciones del menú
+        echo ""
+        printC "Menu Ejecutar:" "$YELLOW" "$BOLD"
+        echo "Seleccione una opción:"
+        printC "1) sig. pag." "" "$BOLD"
+        printC "2) prev. pag." "" "$BOLD"
+        printC "3) seleccionar programa" "" "$BOLD"
+        printC "4. Regresar" "" "$BOLD"
+
+        # leer opción del usuario
+        echo ""
+        echo -n -e "$GREEN>> "
+        read option
+        echo -e "$RESET"
+
+        clear
+        echo ""
+        # procesar opción seleccionada
+        case $option in
+        1) # avanzar a la siguiente página
+            show_files "1" "build"
+            ;;
+        2) # retroceder a la página anterior
+            show_files "2" "build"
+            ;;
+        3) # buscar programa
+            echo "Escribe el nombre del programa:"
+            echo -n -e "$GREEN>> "
+            read build_exe
+            echo -e "$RESET"
+            clear
+            echo ""
+
+            if check_exe_name "$build_exe"; then
+                echo "Ingrese un numero de procesos a ejecutar:"
+                echo -n -e "$GREEN>> "
+                read num_proc
+                echo -e "$RESET"
+                clear
+                echo ""
+
+                if check_num_proc "$num_proc"; then
+                    ejecutar "$num_proc" "$build_exe"
+                    printC "Presione enter para continuar."
+                    read continuar
+                    clear
+                fi
+            fi
+            show_files "" "build"
+            ;;
+        4) # regresar
+            return
+            ;;
+        *)  
+            clear
+            echo ""
+            printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
+            show_files "" "build"
+            ;;
+        esac
+    done
+}
+
+# Función para el menú de Eliminar
+function mostrar_menu_eliminar() {
+    echo "Menu Eliminar:"
+    echo "1. Eliminar archivo ejecutable"
+    echo "2. Eliminar archivo de salida"
+    echo "3. Regresar"
+
+    # leer opción del usuario
+    echo ""
+    echo -n -e "$GREEN>> "
+    read option
+    echo -e "$RESET"
+
+    case $opc in
+    1)
+        echo "Eliminando archivo ejecutable..."
+        # Aquí va el comando para eliminar archivo ejecutable
+        ;;
+    2)
+        echo "Eliminando archivo de salida..."
+        # Aquí va el comando para eliminar archivo de salida
+        ;;
+    3)
+        return
+        ;;
+    *)
+        echo "Opción inválida, seleccione otra vez"
+        ;;
+    esac
+}
+
+# Función para imprimir la información de uso del script
+function imprimir_info_uso() {
+    echo ""
+    printC "Uso: mpiLCI [-s archivo_fuente] [-np num_procesos] [-b nombre_ejecutable] [-m]" "$GREEN" ""
+    printC " "
+    printC "Opciones:" "$YELLOW" "$BOLD"
+    printC "-s    Nombre del archivo fuente, con extensión .c o .cpp" "" "$BOLD"
+    printC "      Debe comprobarse que la extensión esté correctamente escrita y que no esté vacía" "" "$BOLD"
+    printC "-np   Número de procesos que serán candidatos a ejecutar" "" "$BOLD"
+    printC "      Debe comprobarse que se coloque un número mayor a 0 y entero, y que no esté vacío" "" "$BOLD"
+    printC "-b    Nombre del ejecutable" "" "$BOLD"
+    printC "      Debe comprobarse que no esté vacío" "" "$BOLD"
+    printC "-m    Menu del mpiLCI" "" "$BOLD"
+    printC "      Muestra un menú para compilar, ejecutar y eliminar archivos" "" "$BOLD"
+}
+
+# Imprime los lementos de un arreglo de archivos de 5 en 5
+function show_files() {
+    direccion_pag="$1"
+    orden="$2"
+    if [ "$orden" = "build" ]; then
+        files=("$dirBuild"/*)
+    else
+        files=("$dirSource"/*)
+    fi
+    printC "Archivos disponibles en el directorio \"MPI/$2MPI/\"" "" "$BOLD"
+    if [ -n "$direccion_pag" ]; then
+        if [ "$direccion_pag" = "1" ]; then
+            if ((end + 5 < ${#files[@]})); then
+                start=$((start + 5))
+                end=$((end + 5))
+            else
+                end=$((${#files[@]} - 1))
+                start=$((end - 4))
+                printC ">>>Ultima página." "$YELLOW" ""
+            fi
+        elif [ "$direccion_pag" = "2" ]; then
+            if ((start - 5 >= 0)); then
+                start=$((start - 5))
+                end=$((end - 5))
+            else
+                start=0
+                end=4
+                printC ">>>Primera página." "$YELLOW" ""
+            fi
+        fi
+    fi
+
+    if ((${#files[@]} != 0)); then
+        if ((end >= ${#files[@]})); then
+            end=$((${#files[@]} - 1))
+        fi
+        if ((start < 0)); then
+            start=0
+        fi
+        for ((i = start; i <= end; i++)); do
+            name=$(basename "${files[$i]}") # obtiene el nombre del archivo
+            printC "$((i + 1))- $name" "" "$BOLD"
+        done
+    fi
+}
+
+function check_source() {
+    if [[ -z "$1" ]]; then
+        printC "Error: falta especificar el archivo fuente con la opción -s" "$YELLOW" "$BOLD"
+        return 1
+    elif [[ ! "$1" =~ \.(c|cpp)$ ]]; then
+        printC "Error: el archivo fuente debe tener extensión .c o .cpp" "$YELLOW" "$BOLD"
+        return 1
+    elif ! [ -e $dir/sourceMPI/$1 ]; then
+        printC "Error: el archivo $1 no existe" "$RED" "$BOLD"
+        return 1
+    fi
+
+    return 0
+}
+
+function check_num_proc() {
+    if [[ -z "$1" ]]; then
+        printC "Error: falta especificar el número de procesos con la opción -np" "$YELLOW" "$BOLD"
+        return 1
+    elif ! [[ "$1" =~ ^[0-9]+$ ]] || [[ "$1" -le 0 ]]; then
+        printC "Error: el número de procesos debe ser un entero mayor a cero" "$RED" "$BOLD"
+        return 1
+    fi
+
+    return 0
+}
+
+function check_exe_name() {
+    if [[ -z "$1" ]]; then
+        printC "Error: falta especificar el nombre del ejecutable -b" "$YELLOW" "$BOLD"
+        return 1
+    elif ! [ -e $dir/buildMPI/$1 ]; then
+        printC "Error: el archivo $1 no existe" "$RED" "$BOLD"
+        return 1
+    fi
+
+    return 0
+}
+
+#Función para verificar si una cadena está vacía
+function is_empty() {
+    if [[ -z "$1" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function compilar() {
+    if [[ $2 =~ \.c$ ]]; then
+        printC "Ejecutanto: mpicc -o $dir/buildMPI/$1 $dir/sourceMPI/$2" "$YELLOW" "$BOLD"
+        error=$(mpicc -o $dir/buildMPI/$1 $dir/sourceMPI/$2)
+    elif [[ $2 =~ \.cpp$ ]]; then
+        printC "Ejecutanto: mpic -o $dir/buildMPI/$1 $dir/sourceMPI/$2" "$YELLOW" "$BOLD"
+        error=$(mpic++ -o $dir/buildMPI/$1 $dir/sourceMPI/$2)
+    else
+        printC "$2 no tiene una extension valida (.c o .cpp)" "$YELLOW" "$BOLD"
+        return 1
+    fi
+
+    if [ -n "$error" -o $? -ne 0 ]; then
+
+        printC ">El cmando mpirun fallo con el codigo de salida: $error" "$RED" "$BOLD"
+        return 1
+    else
+        printC ">>>Compilation successful" "$GREEN" "$BOLD"
+        printC "Codigo fuente: $2" "$GREEN" "$BOLD"
+        printC "Programa: $1" "$GREEN" "$BOLD"
+        echo ""
+    fi
+
+    return 0
+}
+
+function ejecutar() {
+    printC "Ejecutanto: mpirun -np $1 $dir/buildMPI/$2" "$YELLOW" "$BOLD"
+    error=$(mpirun -np $1 $dir/buildMPI/$2 2>&1 >$dir/outputMPI/$2.txt)
+    if [ -n "$error" -o $? -ne 0 ]; then
+        printC ">El cmando mpirun fallo con el codigo de salida: $error" "$RED" "$BOLD"
+        return 1
+    else
+        printC "Programa: $2" "$GREEN" "$BOLD"
+        printC "Num. procesos: $1" "$GREEN" "$BOLD"
+        printC ">>>Output:" "$YELLOW" "$BOLD"
+        echo "-----------------------------------------------------------"
+        cat $dir/outputMPI/$2.txt
+        echo "-----------------------------------------------------------"
+        printC "Guardando resultados en \"$dirOut/$2.txt\"" "$YELLOW" ""
+    fi
+
+    return 0
+}
+
+#Verificar si se pasaron parámetros
+if [[ $# -eq 0 ]]; then
+    imprimir_info_uso
+    exit 1
+fi
+
+s_flag=0
+np_flag=0
+b_flag=0
+m_flag=0
+
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+    -s)
+        s_flag=1
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            source_file="$2"
+            shift
+        else
+            printC "Error: se debe especificar argumento después de la opción -s." "$RED" ""
+            exit 1
+        fi
+        shift
+        ;;
+    -np)
+        np_flag=1
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            num_processes="$2"
+            shift
+        else
+            printC "Error: se debe especificar un argumento después de la opción -np." "$RED" ""
+            exit 1
+        fi
+        shift
+        ;;
+    -b)
+        b_flag=1
+        if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+            exe_name="$2"
+            shift
+        else
+            printC "Error: se debe especificar argumento después de la opción -b." "$RED" ""
+            exit 1
+        fi
+        shift
+        ;;
+    -m)
+        m_flag=1
+        shift
+        ;;
+    *)
+        # Si se proporciona una opción no válida, imprimimos el mensaje de uso y salimos
+        imprimir_info_uso
+        exit 1
+        ;;
+    esac
+done
+
+# Comprobamos las combinaciones válidas de opciones
+if [[ $m_flag -eq 1 ]]; then
+    # Si se proporciona la opción -m sola o en combinación con otras opciones, no se requiere ninguna otra comprobación
+    mostrar_menu_mpic
+    exit 0
+
+elif [[ $s_flag -eq 1 && $np_flag -eq 0 && $b_flag -eq 0 ]]; then
+    # Combinación 1: solo se proporciona la opción -s
+    if check_source "$source_file"; then
+        exe="${source_file%.*}"
+        compilar "$exe" "$source_file"
+    else
+        exit 1
+    fi
+
+elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 0 ]]; then
+    # Combinación 2: se proporcionan las opciones -s y -np
+    if check_source "$source_file"; then
+        exe="${source_file%.*}"
+        if compilar "$exe" "$source_file"; then
+            if check_num_proc "$num_processes"; then
+                exe_name="${source_file%.*}"
+                ejecutar "$num_processes" "$exe_name"
+            else
+                exit 1
+            fi
+        else
+            exit 1
+        fi
+    else
+        exit 1
+    fi
+
+elif
+    [[ $s_flag -eq 1 && $np_flag -eq 0 && $b_flag -eq 1 ]]
+then
+    # Combinación 3: se proporcionan las opciones -s y -b
+    if check_source "$source_file"; then
+        if [ -n "$exe_name" ]; then
+            if compilar "$exe_name" "$source_file"; then
+                num_processes="2"
+                ejecutar "$num_processes" "$exe_name"
+            else
+                exit 1
+            fi
+        else
+            exit 1
+        fi
+    else
+        exit 1
+    fi
+
+elif
+    [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 ]]
+then
+    # Combinación 4: se proporcionan las opciones -s, -np y -b
+    if check_source "$source_file"; then
+        if [ -n "$exe_name" ]; then
+            if compilar "$exe_name" "$source_file"; then
+                if check_num_proc "$num_processes"; then
+                    ejecutar "$num_processes" "$exe_name"
+                else
+                    exit 1
+                fi
+            else
+                exit 1
+            fi
+        else
+            exit 1
+        fi
+    else
+        exit 1
+    fi
+
+elif
+    [[ $s_flag -eq 0 && $np_flag -eq 1 && $b_flag -eq 1 ]]
+then
+    # Combinación 5: se proporcionan las opciones -np y -b
+    if [ -n "$exe_name" ]; then
+        if check_num_proc "$num_processes"; then
+            ejecutar "$num_processes" "$exe_name"
+        else
+            exit 1
+        fi
+    else
+        exit 1
+    fi
+else
+    # Si no se proporciona ninguna opción o una combinación inválida, imprimimos el mensaje de uso y salimos
+    imprimir_info_uso
+    exit 1
+fi
