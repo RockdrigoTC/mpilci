@@ -2,7 +2,7 @@
 
 source printColors
 
-dir="$(pwd)/MPI"
+dir="$HOME/MPI"
 dirSource="$dir/sourceMPI"
 dirBuild="$dir/buildMPI"
 dirOut="$dir/outputMPI"
