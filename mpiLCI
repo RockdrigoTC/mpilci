@@ -173,7 +173,7 @@ function mostrar_menu_ejecutar() {
                 echo ""
 
                 if check_num_proc "$num_proc"; then
-                    ejecutar "$num_proc" "$build_exe"
+                    ejecutar "$num_proc" "$build_exe" "all.txt"
                     printC "Presione enter para continuar."
                     read continuar
                     clear
@@ -197,9 +197,10 @@ function mostrar_menu_ejecutar() {
 # Función para el menú de Eliminar
 function mostrar_menu_eliminar() {
     echo "Menu Eliminar:"
-    echo "1. Eliminar archivo ejecutable"
-    echo "2. Eliminar archivo de salida"
-    echo "3. Regresar"
+    echo "1. Eliminar archivo fuente"
+    echo "2. Eliminar archivo ejecutable"
+    echo "3. Eliminar archivo de salida"
+    echo "4. Regresar"
 
     # leer opción del usuario
     echo ""
@@ -505,8 +506,12 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 0 && $mf_flag -eq 1 ]]; t
         exe="${source_file%.*}"
         if compilar "$exe" "$source_file"; then
             if check_num_proc "$num_processes"; then
-                exe_name="${source_file%.*}"
-                ejecutar "$num_processes" "$exe_name" ""
+                if check_machine_file "$machine_file"; then
+                    exe_name="${source_file%.*}"
+                    ejecutar "$num_processes" "$exe_name" "$machine_file"
+                else
+                    exit 1
+                fi
             else
                 exit 1
             fi
@@ -539,8 +544,12 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 0 && $b_flag -eq 1 && $mf_flag -eq 1 ]]; t
     if check_source "$source_file"; then
         if [ -n "$exe_name" ]; then
             if compilar "$exe_name" "$source_file"; then
-                num_processes="2"
-                ejecutar "$num_processes" "$exe_name" ""
+                if check_machine_file "$machine_file"; then
+                    num_processes="2"
+                    ejecutar "$num_processes" "$exe_name" "$machine_file"
+                else
+                    exit 1
+                fi
             else
                 exit 1
             fi
@@ -577,7 +586,11 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 1 ]] ;t
         if [ -n "$exe_name" ]; then
             if compilar "$exe_name" "$source_file"; then
                 if check_num_proc "$num_processes"; then
-                    ejecutar "$num_processes" "$exe_name" ""
+                    if check_machine_file "$machine_file"; then
+                        ejecutar "$num_processes" "$exe_name" "$machine_file"
+                    else
+                        exit 1
+                    fi
                 else
                     exit 1
                 fi
@@ -593,7 +606,7 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 1 ]] ;t
 
 elif [[ $s_flag -eq 0 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 0 ]]; then
     # Combinación 5: se proporcionan las opciones -np y -b
-    if [ -n "$exe_name" ]; then
+    if check_exe_name "$exe_name"; then
         if check_num_proc "$num_processes"; then
             ejecutar "$num_processes" "$exe_name" "all.txt"
         else
@@ -607,7 +620,11 @@ elif [[ $s_flag -eq 0 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 1 ]]; t
     # Combinación 5: se proporcionan las opciones -np, -b y -mf
     if [ -n "$exe_name" ]; then
         if check_num_proc "$num_processes"; then
-            ejecutar "$num_processes" "$exe_name" ""
+            if check_machine_file "$machine_file"; then
+                ejecutar "$num_processes" "$exe_name" "$machine_file"
+            else
+                exit 1
+            fi
         else
             exit 1
         fi
