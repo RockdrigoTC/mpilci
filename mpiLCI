@@ -54,7 +54,7 @@ function mostrar_menu_mpic() {
 
 # Función para el menú de Compilar
 function mostrar_menu_compilar() {
-    
+
     # mostrar la primera página de archivos
     start=0
     end=4
@@ -90,8 +90,8 @@ function mostrar_menu_compilar() {
             show_files "2" "source"
             ;;
         3) # buscar codigo fuente
-	        show_files "" "source"
-	        echo ""
+            show_files "" "source"
+            echo ""
             printC "Escribe el nombre del archivo fuente name.c o name.cpp:" "" "$BOLD"
             echo -n -e "$GREEN>> "
             read source
@@ -159,8 +159,8 @@ function mostrar_menu_ejecutar() {
             show_files "2" "build"
             ;;
         3) # buscar programa
-	        show_files "" "build"
-	        echo ""
+            show_files "" "build"
+            echo ""
             printC "Escribe el nombre del programa:" "" "$BOLD"
             echo -n -e "$GREEN>> "
             read build_exe
@@ -188,7 +188,7 @@ function mostrar_menu_ejecutar() {
         4) # regresar
             return
             ;;
-        *)  
+        *)
             clear
             echo ""
             printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
@@ -202,7 +202,7 @@ function mostrar_menu_ejecutar() {
 function mostrar_menu_eliminar() {
 
     clear
-    
+
     # loop del menú
     while true; do
         # mostrar opciones del menú
@@ -263,6 +263,7 @@ function mostrar_menu_eliminar() {
                     clear
                     echo ""
                     if check_source "$source"; then
+                        rm "$dirSource/$source"
                         printC "El archivo $source se elimino con exito" "$GREEN" ""
                         printC "Presione enter para continuar."
                         read continuar
@@ -326,7 +327,7 @@ function mostrar_menu_eliminar() {
                     echo ""
 
                     if check_exe_name "$build_exe"; then
-			rm "$dirBuild/$build_exe"
+                        rm "$dirBuild/$build_exe"
                         printC "El archivo $build_exe se elimino con exito" "$GREEN" ""
                         printC "Presione enter para continuar."
                         read continuar
@@ -348,8 +349,68 @@ function mostrar_menu_eliminar() {
             done
             ;;
         3)
-            echo "Eliminando archivo de salida..."
-            # Aquí va el comando para eliminar archivo de salida
+            start=0
+            end=4
+            clear
+            echo ""
+            show_files "" "output"
+            while true; do
+                # mostrar opciones del menú
+                echo ""
+                printC "Eliminar archivo de salida" "$YELLOW" ""
+                echo "Seleccione una opción:"
+                printC "1) sig. pag." "" "$BOLD"
+                printC "2) prev. pag." "" "$BOLD"
+                printC "3) seleccionar programa" "" "$BOLD"
+                printC "4) regresar" "" "$BOLD"
+
+                # leer opción del usuario
+                echo ""
+                echo -n -e "$GREEN>> "
+                read option
+                echo -e "$RESET"
+
+                clear
+                echo ""
+                # procesar opción seleccionada
+                case $option in
+                1) # avanzar a la siguiente página
+                    show_files "1" "output"
+                    ;;
+                2) # retroceder a la página anterior
+                    show_files "2" "output"
+                    ;;
+                3) # buscar codigo fuente
+                    show_files "" "output"
+                    echo ""
+                    printC "Escribe el nombre del archivo:" "" "$BOLD"
+                    echo -n -e "$GREEN>> "
+                    read output_name
+                    echo -e "$RESET"
+                    clear
+                    echo ""
+
+                    if check_output_name "$output_name"; then
+                        rm "$dirOut/$output_name"
+                        printC "El archivo $output_name se elimino con exito" "$GREEN" ""
+                        printC "Presione enter para continuar."
+                        read continuar
+                        clear
+                        echo ""
+                    fi
+                    show_files "" "output"
+                    ;;
+                4) # regresar
+                    return
+                    ;;
+                *)
+                    clear
+                    echo ""
+                    printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
+                    show_files "" "output"
+                    ;;
+                esac
+            done
             ;;
         4) # regresar
             return
@@ -377,6 +438,8 @@ function imprimir_info_uso() {
     printC "      Se espera el nombre del archivo con las maquinas a ejecutar >archivo.txt<" "" ""
     printC "-M    Menu del mpiLCI" "" "$BOLD"
     printC "      Muestra un menú para compilar, ejecutar y eliminar archivos" "" ""
+    printC ""
+    printC "ServicioSocial Enero-Junio 2023" "" "$BOLD"
 }
 
 # Imprime los lementos de un arreglo de archivos de 5 en 5
@@ -472,6 +535,21 @@ function check_machine_file() {
         printC "Error: el archivo machinefile debe tener extensión .txt" "$YELLOW" "$BOLD"
         return 1
     elif ! [ -e $dirMachine/$1 ]; then
+        printC "Error: el archivo $1 no existe" "$RED" "$BOLD"
+        return 1
+    fi
+
+    return 0
+}
+
+function check_output_name() {
+    if [[ -z "$1" ]]; then
+        printC "Error: falta especificar el nombre del archivo de salida" "$YELLOW" "$BOLD"
+        return 1
+    elif [[ ! "$1" =~ \.txt$ ]]; then
+        printC "Error: el archivo salida debe tener extensión .txt" "$YELLOW" "$BOLD"
+        return 1
+    elif ! [ -e $dirOut/$1 ]; then
         printC "Error: el archivo $1 no existe" "$RED" "$BOLD"
         return 1
     fi
@@ -638,7 +716,7 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 0 && $mf_flag -eq 0 ]]; t
     fi
 
 elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 0 && $mf_flag -eq 1 ]]; then
-    # Combinación 2: se proporcionan las opciones -s, -np y -mf 
+    # Combinación 2: se proporcionan las opciones -s, -np y -mf
     if check_source "$source_file"; then
         exe="${source_file%.*}"
         if compilar "$exe" "$source_file"; then
@@ -697,7 +775,7 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 0 && $b_flag -eq 1 && $mf_flag -eq 1 ]]; t
         exit 1
     fi
 
-elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 0 ]] ;then
+elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 0 ]]; then
     # Combinación 4: se proporcionan las opciones -s, -np y -b
     if check_source "$source_file"; then
         if [ -n "$exe_name" ]; then
@@ -717,7 +795,7 @@ elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 0 ]] ;t
         exit 1
     fi
 
-elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 1 ]] ;then
+elif [[ $s_flag -eq 1 && $np_flag -eq 1 && $b_flag -eq 1 && $mf_flag -eq 1 ]]; then
     # Combinación 4: se proporcionan las opciones -s, -np, -b y y -mf
     if check_source "$source_file"; then
         if [ -n "$exe_name" ]; then
