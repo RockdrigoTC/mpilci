@@ -17,7 +17,7 @@ function mostrar_menu_mpic() {
     opc=0
     while [ $opc -ne 4 ]; do
         echo ""
-        printC "Menu mpiLCI:" "$YELLOW" "$BOLD"
+        printC "Menu mpiLCI:" "$YELLOW" ""
         printC "1. Compilar" "" "$BOLD"
         printC "2. Ejecutar" "" "$BOLD"
         printC "3. Eliminar" "" "$BOLD"
@@ -66,7 +66,7 @@ function mostrar_menu_compilar() {
     while true; do
         # mostrar opciones del menú
         echo ""
-        printC "Menu Compilar:" "$YELLOW" "$BOLD"
+        printC "Menu Compilar:" "$YELLOW" ""
         echo "Seleccione una opción:"
         printC "1) sig. pag." "" "$BOLD"
         printC "2) prev. pag." "" "$BOLD"
@@ -90,7 +90,9 @@ function mostrar_menu_compilar() {
             show_files "2" "source"
             ;;
         3) # buscar codigo fuente
-            echo "Escribe el nombre del archivo fuente name.c o name.cpp:"
+	        show_files "" "source"
+	        echo ""
+            printC "Escribe el nombre del archivo fuente name.c o name.cpp:" "" "$BOLD"
             echo -n -e "$GREEN>> "
             read source
             echo -e "$RESET"
@@ -133,7 +135,7 @@ function mostrar_menu_ejecutar() {
     while true; do
         # mostrar opciones del menú
         echo ""
-        printC "Menu Ejecutar:" "$YELLOW" "$BOLD"
+        printC "Menu Ejecutar:" "$YELLOW" ""
         echo "Seleccione una opción:"
         printC "1) sig. pag." "" "$BOLD"
         printC "2) prev. pag." "" "$BOLD"
@@ -157,7 +159,9 @@ function mostrar_menu_ejecutar() {
             show_files "2" "build"
             ;;
         3) # buscar programa
-            echo "Escribe el nombre del programa:"
+	        show_files "" "build"
+	        echo ""
+            printC "Escribe el nombre del programa:" "" "$BOLD"
             echo -n -e "$GREEN>> "
             read build_exe
             echo -e "$RESET"
@@ -196,50 +200,183 @@ function mostrar_menu_ejecutar() {
 
 # Función para el menú de Eliminar
 function mostrar_menu_eliminar() {
-    echo "Menu Eliminar:"
-    echo "1. Eliminar archivo fuente"
-    echo "2. Eliminar archivo ejecutable"
-    echo "3. Eliminar archivo de salida"
-    echo "4. Regresar"
 
-    # leer opción del usuario
-    echo ""
-    echo -n -e "$GREEN>> "
-    read option
-    echo -e "$RESET"
+    clear
+    
+    # loop del menú
+    while true; do
+        # mostrar opciones del menú
+        echo ""
+        printC "Menu Eliminar:" "$YELLOW" ""
+        echo "Seleccione una opción:"
+        printC "1. Eliminar archivo fuente" "" "$BOLD"
+        printC "2. Eliminar archivo ejecutable" "" "$BOLD"
+        printC "3. Eliminar archivo de salida" "" "$BOLD"
+        printC "4. Regresar" "" "$BOLD"
 
-    case $opc in
-    1)
-        echo "Eliminando archivo ejecutable..."
-        # Aquí va el comando para eliminar archivo ejecutable
-        ;;
-    2)
-        echo "Eliminando archivo de salida..."
-        # Aquí va el comando para eliminar archivo de salida
-        ;;
-    3)
-        return
-        ;;
-    *)
-        echo "Opción inválida, seleccione otra vez"
-        ;;
-    esac
+        # leer opción del usuario
+        echo ""
+        echo -n -e "$GREEN>> "
+        read opt
+        echo -e "$RESET"
+
+        case $opt in
+        1)
+            start=0
+            end=4
+            clear
+            echo ""
+            show_files "" "source"
+            while true; do
+                # mostrar opciones del menú
+                echo ""
+                printC "Eliminar archivo fuente" "$YELLOW" ""
+                echo "Seleccione una opción:"
+                printC "1) sig. pag." "" "$BOLD"
+                printC "2) prev. pag." "" "$BOLD"
+                printC "3) seleccionar archivo" "" "$BOLD"
+                printC "4) regresar" "" "$BOLD"
+
+                # leer opción del usuario
+                echo ""
+                echo -n -e "$GREEN>> "
+                read option
+                echo -e "$RESET"
+
+                clear
+                echo ""
+                # procesar opción seleccionada
+                case $option in
+                1) # avanzar a la siguiente página
+                    show_files "1" "source"
+                    ;;
+                2) # retroceder a la página anterior
+                    show_files "2" "source"
+                    ;;
+                3) # buscar codigo fuente
+                    show_files "" "source"
+                    echo ""
+                    printC "Escribe el nombre del archivo fuente name.c o name.cpp:" "" "$BOLD"
+                    echo -n -e "$GREEN>> "
+                    read source
+                    echo -e "$RESET"
+                    clear
+                    echo ""
+                    if check_source "$source"; then
+                        printC "El archivo $source se elimino con exito" "$GREEN" ""
+                        printC "Presione enter para continuar."
+                        read continuar
+                        clear
+                        echo ""
+                    fi
+                    show_files "" "source"
+                    ;;
+                4) # regresar
+                    return
+                    ;;
+                *)
+                    clear
+                    echo ""
+                    printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
+                    show_files "" "source"
+                    ;;
+                esac
+            done
+            ;;
+        2)
+            start=0
+            end=4
+            clear
+            echo ""
+            show_files "" "build"
+            while true; do
+                # mostrar opciones del menú
+                echo ""
+                printC "Eliminar archivo ejecutable" "$YELLOW" ""
+                echo "Seleccione una opción:"
+                printC "1) sig. pag." "" "$BOLD"
+                printC "2) prev. pag." "" "$BOLD"
+                printC "3) seleccionar programa" "" "$BOLD"
+                printC "4) regresar" "" "$BOLD"
+
+                # leer opción del usuario
+                echo ""
+                echo -n -e "$GREEN>> "
+                read option
+                echo -e "$RESET"
+
+                clear
+                echo ""
+                # procesar opción seleccionada
+                case $option in
+                1) # avanzar a la siguiente página
+                    show_files "1" "build"
+                    ;;
+                2) # retroceder a la página anterior
+                    show_files "2" "build"
+                    ;;
+                3) # buscar codigo fuente
+                    show_files "" "build"
+                    echo ""
+                    printC "Escribe el nombre del programa:" "" "$BOLD"
+                    echo -n -e "$GREEN>> "
+                    read build_exe
+                    echo -e "$RESET"
+                    clear
+                    echo ""
+
+                    if check_exe_name "$build_exe"; then
+			rm "$dirBuild/$build_exe"
+                        printC "El archivo $build_exe se elimino con exito" "$GREEN" ""
+                        printC "Presione enter para continuar."
+                        read continuar
+                        clear
+                        echo ""
+                    fi
+                    show_files "" "build"
+                    ;;
+                4) # regresar
+                    return
+                    ;;
+                *)
+                    clear
+                    echo ""
+                    printC "Opción inválida, seleccione otra vez" "$RED" "$BOLD"
+                    show_files "" "build"
+                    ;;
+                esac
+            done
+            ;;
+        3)
+            echo "Eliminando archivo de salida..."
+            # Aquí va el comando para eliminar archivo de salida
+            ;;
+        4) # regresar
+            return
+            ;;
+        *)
+            echo "Opción inválida, seleccione otra vez"
+            ;;
+        esac
+    done
 }
 
 # Función para imprimir la información de uso del script
 function imprimir_info_uso() {
     echo ""
-    printC "Uso: mpiLCI [-s archivo_fuente] [-np num_procesos] [-b nombre_ejecutable] [-m]" "$GREEN" ""
+    printC "Uso: mpiLCI [-s archivo_fuente] [-np num_procesos] [-b nombre_ejecutable] [-mf archivo_maquinas] [-M]" "$GREEN" ""
     printC " "
-    printC "Opciones:" "$YELLOW" "$BOLD"
-    printC "-s    Nombre del archivo fuente, con extensión .c o .cpp" "" "$BOLD"
-    printC "      Debe comprobarse que la extensión esté correctamente escrita y que no esté vacía" "" "$BOLD"
-    printC "-np   Número de procesos que serán candidatos a ejecutar" "" "$BOLD"
-    printC "      Debe comprobarse que se coloque un número mayor a 0 y entero, y que no esté vacío" "" "$BOLD"
+    printC "Opciones:" "$YELLOW" ""
+    printC "-s    Nombre del archivo fuente" "" "$BOLD"
+    printC "      Se espera el nombre del archivo fuente. >archivo.c/cpp<" "" ""
+    printC "-np   Número de procesos" "" "$BOLD"
+    printC "      Numero de procesos que seran candidatos a ejecutar >entero<" "" ""
     printC "-b    Nombre del ejecutable" "" "$BOLD"
-    printC "      Debe comprobarse que no esté vacío" "" "$BOLD"
-    printC "-m    Menu del mpiLCI" "" "$BOLD"
-    printC "      Muestra un menú para compilar, ejecutar y eliminar archivos" "" "$BOLD"
+    printC "      Se espera el nombre del archivo ejecutable >archivo<" "" ""
+    printC "-mf   Nombre del archivo de maquinas" "" "$BOLD"
+    printC "      Se espera el nombre del archivo con las maquinas a ejecutar >archivo.txt<" "" ""
+    printC "-M    Menu del mpiLCI" "" "$BOLD"
+    printC "      Muestra un menú para compilar, ejecutar y eliminar archivos" "" ""
 }
 
 # Imprime los lementos de un arreglo de archivos de 5 en 5
@@ -283,7 +420,7 @@ function show_files() {
         fi
         for ((i = start; i <= end; i++)); do
             name=$(basename "${files[$i]}") # obtiene el nombre del archivo
-            printC "$((i + 1))- $name" "" "$BOLD"
+            printC "- $name" "" ""
         done
     fi
 }
