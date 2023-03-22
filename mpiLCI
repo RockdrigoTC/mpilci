@@ -449,8 +449,10 @@ function show_files() {
     orden="$2"
     if [ "$orden" = "build" ]; then
         files=("$dirBuild"/*)
-    else
+    elif [ "$orden" = "source" ]; then
         files=("$dirSource"/*)
+    elif [ "$orden" = "output" ]; then
+        files=("$dirOut"/*)
     fi
     printC "Archivos disponibles en el directorio \"MPI/$2MPI/\"" "" "$BOLD"
     if [ -n "$direccion_pag" ]; then
