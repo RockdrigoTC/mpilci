@@ -1,0 +1,52 @@
+.TH mpiLCI 1 "18 Marzo 2023" "Servicio Social-LCI TECNM-Veracruz Enero-Junio 2023"
+
+.SH NOMBRE
+mpiLCI - Herramienta para compilar y ejecutar programas MPI
+
+.SH SINOPSIS
+.B mpiLCI
+[\fIOpciones\fR]
+
+.SH DESCRIPCIÓN
+mpiLCI es una herramienta para compilar y ejecutar programas MPI en Linux. Con mpiLCI, puedes compilar y ejecutar programas MPI de manera sencilla y rápida.
+
+.SH OPCIONES
+.TP
+\fB-s\fR \fIarchivo_fuente\fR
+Nombre del archivo fuente. Se espera el nombre del archivo fuente: archivo.c/cpp.
+
+.TP
+\fB-np\fR \fInum_procesos\fR
+Número de procesos. Número de procesos que serán candidatos a ejecutar. Debe ser un entero.
+
+.TP
+\fB-b\fR \fInombre_ejecutable\fR
+Nombre del ejecutable. Se espera el nombre del archivo ejecutable: archivo.
+
+.TP
+\fB-mf\fR \fIarchivo_maquinas\fR
+Nombre del archivo de máquinas. Se espera el nombre del archivo con las máquinas a ejecutar: archivo.txt.
+
+.TP
+\fB-M\fR
+Menú del mpiLCI. Muestra un menú para compilar, ejecutar y eliminar archivos.
+
+.SH EJEMPLOS
+Compilar:
+.PP
+.B mpiLCI -s archivo.c
+.PP
+Compilar y ejecutar con 4 procesos:
+.PP
+.B mpiLCI -s programa.c -np 4
+.PP
+Ejecutar con procesos por defecto (2):
+.PP
+.B mpiLCI -b programa
+.PP
+Menú interactivo:
+.PP
+.B mpiLCI -M
+
+.SH AUTOR
+Este programa fue creado por el Servicio Social-LCI TECNM-Veracruz Enero-Junio 2023.
