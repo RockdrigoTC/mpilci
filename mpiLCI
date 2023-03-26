@@ -356,7 +356,7 @@ function compilar() {
         printC "Ejecutanto: mpicc -o $dir/buildMPI/$1 $dir/sourceMPI/$2" "$YELLOW" "$BOLD"
         error=$(mpicc -o $dir/buildMPI/$1 $dir/sourceMPI/$2)
     elif [[ $2 =~ \.cpp$ ]]; then
-        printC "Ejecutanto: mpic -o $dir/buildMPI/$1 $dir/sourceMPI/$2" "$YELLOW" "$BOLD"
+        printC "Ejecutanto: mpic++ -o $dir/buildMPI/$1 $dir/sourceMPI/$2" "$YELLOW" "$BOLD"
         error=$(mpic++ -o $dir/buildMPI/$1 $dir/sourceMPI/$2)
     else
         printC "$2 no tiene una extension valida (.c o .cpp)" "$YELLOW" "$BOLD"
